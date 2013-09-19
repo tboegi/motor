@@ -1,0 +1,20 @@
+--- ../../../../../vendor/motorR6-7-1/motorApp/MotorSrc/motorRecord.cc	2013-06-18 12:09:22.000000000 +0200
++++ motorRecord.cc	2013-06-20 12:26:09.600011663 +0200
+@@ -455,7 +455,7 @@
+ 
+     min_rdbd = fabs(pmr->mres);
+ 
+-    if (pmr->rdbd < min_rdbd)
++    if (pmr->rdbd != min_rdbd)
+     {
+         pmr->rdbd = min_rdbd;
+         db_post_events(pmr, &pmr->rdbd, DBE_VAL_LOG);
+@@ -2042,7 +2041,7 @@
+     * Now we either act directly on the .val change and return, or we
+     * propagate it into a .dval change.
+     */
+-    if (pmr->val != pmr->lval)
++    if ((pmr->val != pmr->lval) || (pmr->spmg == motorSPMG_Pause))
+     {
+         MARK(M_VAL);
+         if (set && !pmr->foff)

@@ -1,0 +1,89 @@
+<!--
+ $HeadURL:  $
+ $Id:  $
+
+ Project       : CODAC Core System
+
+ Description   : Project description file for a CODAC Core System module
+
+ Authors       : Tilen Zagar
+ 
+ Copyright (c) : TODO
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.iter.codac.units</groupId>
+    <artifactId>epics-motor</artifactId>
+    <packaging>codac</packaging>
+    <version>6.7.1</version>
+    <name>CODAC Core System EPICS Motor record module</name>
+    <description>CODAC Core System EPICS Motor record module</description>
+    <url>http://www.iter.org/</url>
+ 
+    <!-- project properties -->
+    <properties>
+        <unit.type>module</unit.type>
+    </properties>
+
+    <!-- parent pom.xml -->
+    <parent>
+        <groupId>org.iter.codac.units</groupId>
+        <artifactId>maven-iter-settings</artifactId>
+        <version>4.0.0</version>
+    </parent>
+
+    <!-- unit owner and developers -->
+    <developers>
+        <developer>
+            <id>tzagar</id>
+            <roles>
+                <role>unit owner</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <!-- configuration of how the project is built -->
+    <build>
+        <!-- default phase is compile -->
+        <defaultGoal>compile</defaultGoal>
+        <!-- this command is executed if you just write 'mvn' -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-iter-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                <!-- packaging configuration -->
+		    <packaging>
+		      <package>
+		        <include type="file" source="main/epics/dbd/" target="epics/modules/motor/dbd"/>
+		        <include type="file" source="main/epics/lib/" target="epics/modules/motor/lib"/> 
+			<copyright>EPICS Open License</copyright>
+			<packager>ESS Organization</packager>
+		      </package>
+		      <package name="devel">
+		        <include type="file" source="main/epics/include/" target="epics/modules/motor/include"/>
+		        <dependency version="current">%{codac_rpm_prefix}-${project.artifactId}</dependency>
+		        <summary>Development files for EPICS Motor record module</summary>
+				<copyright>EPICS Open License</copyright>
+				<packager>ESS Organization</packager>
+		      </package>
+		      <package name="src">
+		        <include type="source" source="src/main/epics/motorApp" target="epics/modules/motor/src"/>
+			<copyright>EPICS Open License</copyright>
+		        <summary>Source files for EPICS Motor record module</summary>
+			<packager>ESS Organization</packager>
+		      </package>
+		      <package name="doc">
+		        <include type="source" source="src/main/epics/documentation" target="epics/modules/motor/documentation"/>
+			<copyright>EPICS Open License</copyright>
+		        <summary>Documentation for EPICS Motor record module</summary>
+			<packager>ESS Organization</packager>
+		      </package>
+		   </packaging>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
