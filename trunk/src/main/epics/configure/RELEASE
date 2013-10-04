@@ -26,7 +26,7 @@ SNCSEQ=${EPICS_MODULES}/sncseq
 
 # Recommended EPICS release: R3.14.12.1
 #EPICS_BASE=${ENV_EPICS_BASE}
-EPICS_BASE=/opt/codac-4.0/epics/base
+EPICS_BASE=/opt/codac-4.1/epics/base
 #-include $(TOP)/../configure/EPICS_BASE.$(EPICS_HOST_ARCH)
 
 # The following must be defined for the MXmotor device driver.
