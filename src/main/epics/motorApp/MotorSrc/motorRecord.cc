@@ -481,7 +481,7 @@ static void enforceMinRetryDeadband(motorRecord * pmr)
 
     min_rdbd = fabs(pmr->mres);
 
-    if (pmr->rdbd < min_rdbd)
+    if (pmr->rdbd != min_rdbd)
     {
         pmr->rdbd = min_rdbd;
         db_post_events(pmr, &pmr->rdbd, DBE_VAL_LOG);
@@ -2068,7 +2068,7 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
     * Now we either act directly on the .val change and return, or we
     * propagate it into a .dval change.
     */
-    if (pmr->val != pmr->lval)
+    if ((pmr->val != pmr->lval) || (pmr->spmg == motorSPMG_Pause))
     {
         MARK(M_VAL);
         if (set && !pmr->foff)
