@@ -24,6 +24,7 @@
     <!-- project properties -->
     <properties>
         <unit.type>module</unit.type>
+	<rpm.release.num>2</rpm.release.num>
     </properties>
 
     <!-- parent pom.xml -->

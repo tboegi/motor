@@ -1397,9 +1397,10 @@ process_exit:
     alarm_sub(pmr);                     /* If we've violated alarm limits, yell. */
     monitor(pmr);               /* If values have changed, broadcast them. */
 
-    if (pmr->dmov)
+    if (pmr->dmov != 0 && pmr->ldmv == 0)   /* Test for False to True transition. */
         recGblFwdLink(pmr);     /* Process the forward-scan-link record. */
-    
+    pmr->ldmv = pmr->dmov;
+
     pmr->pact = 0;
     Debug(4, "process:---------------------- end; motor \"%s\"\n", pmr->name);
     return (status);
