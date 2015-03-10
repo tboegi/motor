@@ -2442,6 +2442,7 @@ static long special(DBADDR *paddr, int after)
                 if (pmr->dmov == TRUE)
                 {
                     pmr->dmov = FALSE;
+                    pmr->ldmv = pmr->dmov;
                     db_post_events(pmr, &pmr->dmov, DBE_VAL_LOG);
                 }
                 return(OK);
