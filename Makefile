@@ -1,4 +1,4 @@
-include ${EPICS_PATH}/env/module.Makefile
+include ${EPICS_ENV_PATH}/module.Makefile
 
 TEMPLATES=-none-
 SUBSTITUTIONS=-none-
