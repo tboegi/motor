@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  * 
  */                                                          
 
-#define VERSION 6.10
+#define VERSION 6.10001
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -3223,7 +3223,7 @@ static long get_precision(const DBADDR *paddr, long *precision)
         break;
 
     case motorRecordVERS:
-        *precision = 2;
+        *precision = 5;
         break;
 
     default:
