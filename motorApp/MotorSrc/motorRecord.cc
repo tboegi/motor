@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  * 
  */                                                          
 
-#define VERSION 6.10001
+#define VERSION 6.10002
 
 #include    <stdlib.h>
 #include    <string.h>
