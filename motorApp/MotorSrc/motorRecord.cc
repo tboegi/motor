@@ -185,7 +185,7 @@ USAGE...        Motor Record Support.
  *                    Changed error checks from dial to user limits.
  */                                                          
 
-#define VERSION 6.10004
+#define VERSION 6.10005
 
 #include    <stdlib.h>
 #include    <string.h>
@@ -3619,13 +3619,6 @@ static void process_motor_info(motorRecord * pmr, bool initcall)
     if (pmr->lls != old_lls)
         MARK(M_LLS);
 
-    /* If the motor has a problem, stop it if needed */
-    if ((ls_active == true || msta.Bits.RA_PROBLEM) && !msta.Bits.RA_DONE)
-    {
-        pmr->stop = 1;
-        MARK(M_STOP);
-    }
-
     /* Get motor-now-moving indicator. */
     if (ls_active == true || msta.Bits.RA_DONE || msta.Bits.RA_PROBLEM)
     {
@@ -3633,6 +3626,14 @@ static void process_motor_info(motorRecord * pmr, bool initcall)
         if (ls_active == true || msta.Bits.RA_PROBLEM)
         {
             clear_buttons(pmr);
+#if 0
+            /* Don't stop the motor, this should be done in the driver */
+            if (msta.Bits.RA_PROBLEM && !msta.Bits.RA_DONE)
+            {
+                pmr->stop = 1;
+                MARK(M_STOP);
+            }
+#endif
         }
     }
     else
