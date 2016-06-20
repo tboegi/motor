@@ -1,6 +1,15 @@
 include ${EPICS_ENV_PATH}/module.Makefile
 
-TEMPLATES=-none-
+TEMPLATES += motorApp/Db/asyn_auto_power.db
+TEMPLATES += motorApp/Db/asyn_motor.db
+TEMPLATES += motorApp/Db/basic_asyn_motor.db
+TEMPLATES += motorApp/Db/basic_motor.db
+TEMPLATES += motorApp/Db/coordTrans2D.db
+TEMPLATES += motorApp/Db/motor.db
+TEMPLATES += motorApp/Db/motorUtil.db
+TEMPLATES += motorApp/Db/pseudoMotor.db
+TEMPLATES += motorApp/Db/softMotorTest.db
+
 SUBSTITUTIONS=-none-
 PROJECT=motor
 
