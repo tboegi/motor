@@ -2,6 +2,7 @@ include ${EPICS_ENV_PATH}/module.Makefile
 
 TEMPLATES=-none-
 SUBSTITUTIONS=-none-
+USR_DEPENDENCIES = asyn,4.31+
 
 #SOURCES += motorApp/ACRSrc/ACRMotorDriver.cpp
 #HEADERS += motorApp/ACRSrc/ACRMotorDriver.h
