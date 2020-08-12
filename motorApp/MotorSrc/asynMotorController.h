@@ -30,7 +30,6 @@
 #define motorEncoderPositionString      "MOTOR_ENCODER_POSITION"
 #define motorDeferMovesString           "MOTOR_DEFER_MOVES"
 #define motorMoveToHomeString           "MOTOR_MOVE_HOME"
-#define motorResolutionString           "MOTOR_RESOLUTION"
 #define motorEncoderRatioString         "MOTOR_ENCODER_RATIO"
 #define motorPGainString                "MOTOR_PGAIN"
 #define motorIGainString                "MOTOR_IGAIN"
@@ -212,7 +211,6 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   int motorEncoderPosition_;
   int motorDeferMoves_;
   int motorMoveToHome_;
-  int motorResolution_;
   int motorEncoderRatio_;
   int motorPGain_;
   int motorIGain_;
@@ -285,6 +283,8 @@ class epicsShareClass asynMotorController : public asynPortDriver {
   int profileFollowingErrors_;
   #define LAST_MOTOR_PARAM profileFollowingErrors_
 
+  /* For legacy drivers */
+  #define motorResolution_ -1
   int numAxes_;                 /**< Number of axes this controller supports */
   asynMotorAxis **pAxes_;       /**< Array of pointers to axis objects */
   epicsEventId pollEventId_;    /**< Event ID to wake up poller */

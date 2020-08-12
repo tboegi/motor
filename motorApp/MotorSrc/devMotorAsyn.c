@@ -108,7 +108,7 @@ typedef enum motorCommand {
     motorVelBase,
     motorAccel,
     motorPosition,
-    motorResolution,
+    motorRecResolution,
     motorEncRatio,
     motorPGain,
     motorIGain,
@@ -187,6 +187,17 @@ static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
     } else {
        asynPrint(pasynUser, ASYN_TRACE_FLOW,
                  "devMotorAsyn::init_controller, %s set encoder ratio to %2.6lf\n", pmr->name, eratio );
+    }
+
+    /* Write motor resolution to the driver.*/
+    pPvt->pasynUserSync->reason = pPvt->driverReasons[motorRecResolution];
+    status = pasynFloat64SyncIO->write(pPvt->pasynUserSync, pmr->mres, pasynUser->timeout);
+    if (status) {
+       asynPrint(pasynUser, ASYN_TRACE_ERROR,
+                 "devMotorAsyn::init_controller, %s failed to set motorResolution to %2.6lf\n", pmr->name, pmr->mres);
+    } else {
+       asynPrint(pasynUser, ASYN_TRACE_FLOW,
+                 "devMotorAsyn::init_controller, %s set motorResolution to %2.6lf\n", pmr->name, pmr->mres);
     }
 
     switch (pmr->rstm) {
@@ -332,7 +343,7 @@ static long init_record(struct motorRecord * pmr )
     if (findDrvInfo(pmr, pasynUser, motorVelBaseString,                motorVelBase)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorAccelString,                  motorAccel)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorPositionString,               motorPosition)) goto bad;
-    if (findDrvInfo(pmr, pasynUser, motorResolutionString,             motorResolution)) goto bad;
+    if (findDrvInfo(pmr, pasynUser, motorRecResolutionString,          motorRecResolution)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorEncoderRatioString,           motorEncRatio)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorPGainString,                  motorPGain)) goto bad;
     if (findDrvInfo(pmr, pasynUser, motorIGainString,                  motorIGain)) goto bad;
@@ -387,14 +398,6 @@ static long init_record(struct motorRecord * pmr )
        dbScanLock() etc will fail. */
     pasynUser = pasynManager->duplicateAsynUser(pPvt->pasynUser, asynCallback, 0);
 
-    /* Send the motor resolution to the driver.  This should be done in the record
-     * in the future ? */
-/*  DON'T DO THIS FOR NOW.  THE NUMBER CAN COME TOO LATE TO BE OF USE TO THE DRIVER
-    resolution = pmr->mres;
-    pasynUser->reason = pPvt->driverReasons[motorResolution];
-    pPvt->pasynFloat64->write(pPvt->asynFloat64Pvt, pasynUser,
-                  resolution);
-*/
     pasynUser->reason = pPvt->driverReasons[motorStatus];
     status = pPvt->pasynGenericPointer->read(pPvt->asynGenericPointerPvt, pasynUser,
                       (void *)&pPvt->status);
@@ -614,7 +617,7 @@ static RTN_STATUS build_trans( motor_cmnd command,
             pmsg->interface = int32Type;
             break;
         case SET_RESOLUTION:
-            pmsg->command = motorResolution;
+            pmsg->command = motorRecResolution;
             pmsg->dvalue = *param;
             break;
         default:

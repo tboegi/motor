@@ -120,7 +120,7 @@ static motorCommandStruct motorCommands[] = {
     {motorPosition,             motorPositionString},
     {motorEncoderPosition,      motorEncoderPositionString},
     {motorDeferMoves,           motorDeferMovesString},
-    {motorResolution,           motorResolutionString},
+    {motorResolution,           motorRecResolutionString},
     {motorEncRatio,             motorEncoderRatioString},
     {motorPGain,                motorPGainString},
     {motorIGain,                motorIGainString},
