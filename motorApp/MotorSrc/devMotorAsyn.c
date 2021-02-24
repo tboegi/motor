@@ -496,6 +496,7 @@ CALLBACK_VALUE update_values(struct motorRecord * pmr)
     if ( pPvt->needUpdate )
     {
         epicsInt32 rawValue;
+        double     doubleValue;
 
         /* Need to update mflg before using it further down */
         if (pmr->mflg != pPvt->status.flags)
@@ -504,26 +505,24 @@ CALLBACK_VALUE update_values(struct motorRecord * pmr)
             db_post_events(pmr, &pmr->mflg, DBE_VAL_LOG);
         }
 
-        /* motorRecord.cc will handle MRES */
-        pmr->priv->readBack.position = pPvt->status.position;
-        pmr->priv->readBack.encoderPosition = pPvt->status.encoderPosition;
-        if (!(pmr->mflg & MF_DRIVER_USES_EGU))
+        /* rmp */
+        doubleValue = pPvt->status.position;
+        pmr->priv->readBack.motorPositionRaw = doubleValue;
+        rawValue = (epicsInt32)floor(doubleValue + 0.5);
+        if (pmr->rmp != rawValue)
         {
-            /* rmp */
-            rawValue = (epicsInt32)floor(pPvt->status.position + 0.5);
-            if (pmr->rmp != rawValue)
-            {
-                pmr->rmp = rawValue;
-                db_post_events(pmr, &pmr->rmp, DBE_VAL_LOG);
-            }
-            /* rep */
-            rawValue = (epicsInt32)floor(pPvt->status.encoderPosition + 0.5);
+            pmr->rmp = rawValue;
+            db_post_events(pmr, &pmr->rmp, DBE_VAL_LOG);
+        }
 
-            if (pmr->rep != rawValue)
-            {
-                pmr->rep = rawValue;
-                db_post_events(pmr, &pmr->rep, DBE_VAL_LOG);
-            }
+        /* rep */
+        doubleValue = pPvt->status.encoderPosition;
+        pmr->priv->readBack.encoderPositionRaw = doubleValue;
+        rawValue = (epicsInt32)floor(doubleValue + 0.5);
+        if (pmr->rep != rawValue)
+        {
+            pmr->rep = rawValue;
+            db_post_events(pmr, &pmr->rep, DBE_VAL_LOG);
         }
 
         /* Don't post MSTA changes here; motor record's process() function does efficent MSTA posting. */

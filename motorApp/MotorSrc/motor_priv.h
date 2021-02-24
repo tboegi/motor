@@ -12,8 +12,8 @@ extern "C" {
 
   struct motor_priv {
     struct {
-      epicsFloat64 position;           /**< Commanded motor position */
-      epicsFloat64 encoderPosition;    /**< Actual encoder position */
+      epicsFloat64 motorPositionRaw;      /**< Commanded motor position */
+      epicsFloat64 encoderPositionRaw;    /**< Actual encoder position */
     } readBack;
     struct {
       epicsFloat64 motorDialHighLimitRO;   /**< read only high limit from controller. */

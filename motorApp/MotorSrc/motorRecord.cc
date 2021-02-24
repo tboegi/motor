@@ -4423,19 +4423,18 @@ static long readBackPosition(motorRecord *pmr, bool initcall)
     {
         /* An encoder is present and the user wants us to use it. */
         /* device support gave us a double, use it */
+        double encoderPosition = pmr->priv->readBack.encoderPositionRaw;
+        if (!encoderPosition)
+            encoderPosition = (double)pmr->rep;
         if (pmr->mflg & MF_DRIVER_USES_EGU)
         {
-            /* We don't have any value in REP */
-            pmr->drbv = pmr->priv->readBack.encoderPosition;
-            pmr->rrbv = NINT(pmr->drbv / pmr->eres);
+            pmr->drbv = encoderPosition;
+            pmr->rrbv = (epicsInt32)floor((encoderPosition / pmr->eres) + 0.5);
         }
         else
         {
+            pmr->drbv = encoderPosition * pmr->eres;
             pmr->rrbv = pmr->rep;
-            if (pmr->priv->readBack.encoderPosition)
-                pmr->drbv = pmr->priv->readBack.encoderPosition * pmr->eres;
-            else
-                pmr->drbv = pmr->rrbv * pmr->eres;
         }
     }
     else if (pmr->urip == motorUEIP_Yes && initcall == false)
@@ -4472,20 +4471,18 @@ static long readBackPosition(motorRecord *pmr, bool initcall)
     }
     else
     {
-        /* if device support gave us a double, use it */
+        double motorPosition = pmr->priv->readBack.motorPositionRaw;
+        if (!motorPosition)
+            motorPosition = (double)pmr->rmp;
         if (pmr->mflg & MF_DRIVER_USES_EGU)
         {
-            /* We don't have any value in RMP */
-            pmr->drbv = pmr->priv->readBack.position;
-            pmr->rrbv = NINT(pmr->drbv / pmr->mres);
+            pmr->drbv = motorPosition;
+            pmr->rrbv = (epicsInt32)floor((motorPosition / pmr->mres) + 0.5);
         }
         else
         {
+            pmr->drbv = motorPosition * pmr->mres;
             pmr->rrbv = pmr->rmp;
-            if (pmr->priv->readBack.position)
-                pmr->drbv = pmr->priv->readBack.position * pmr->mres;
-            else
-                pmr->drbv = pmr->rrbv * pmr->mres;
         }
     }
     return rtnstat;
