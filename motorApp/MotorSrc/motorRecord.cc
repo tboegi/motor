@@ -2019,12 +2019,11 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(motorRecord *pmr)
 {
     int dir_positive = (pmr->dir == motorDIR_Pos);
     int dir = dir_positive ? 1 : -1;
-    bool too_small;
+    int too_small = 0;
     bool preferred_dir = true;
     double diff = pmr->dval - pmr->drbv;
     double relpos = diff;
     double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv);
-    double absdiff = fabs(diff);
     long rtnstat;
 
 
@@ -2041,39 +2040,15 @@ static RTN_STATUS doDVALchangedOrNOTdoneMoving(motorRecord *pmr)
     if (pmr->rval != pmr->priv->last.rval)
         MARK(M_RVAL);
 
-    /* Don't move if we're within retry deadband. */
-
-    too_small = false;
-    if ((pmr->mip & MIP_RETRY) == 0)
-    {
-        double spdb = pmr->spdb;
-        /*
-         * SPDB overrides MRES.
-         * Example: MRES == 1.0 and SPDP == 0.1 checks for 0.1
-         */
-        if (spdb > 0) {
-            /* Don't move if new setpoint is within SPDB of DRBV */
-            double drbv = pmr->drbv;
-            double dval = pmr->dval;
-            if (((dval - spdb) < drbv) && ((dval + spdb) > drbv)) {
-                too_small = true;
-            }
-        }
-        else if (absdiff < fabs(pmr->mres))
-        {
-            /* Same as (abs(npos - rpos) < 1) */
-            too_small = true;
-        }
-    }
-    else if (absdiff < fabs(pmr->rdbd))
-        too_small = true;
+    /* Don't move if we're within setpoint/retry deadband. */
+    too_small = devSupCalcTooSmall(pmr, diff, pmr->mip & MIP_RETRY);
 
     if (pmr->miss)
     {
         pmr->miss = 0;
         MARK_AUX(M_MISS);
     }
-    if (too_small == true)
+    if (too_small)
     {
         Debug(pmr,2, "too_small dval=%f spdb=%f mres=%f drbv=%f\n",
               pmr->dval, pmr->spdb, pmr->mres, pmr->drbv);

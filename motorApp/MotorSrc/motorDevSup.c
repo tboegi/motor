@@ -328,3 +328,27 @@ void doHomeSetcdir(motorRecord *pmr)
     SEND_MSG();
     pmr->cdir = (command == HOME_FOR) ? 1 : 0;
 }
+
+/*
+ * Not a devSup function as such. Use my motorRecord and devMotorAsyn
+ * Calculate if a movement is too small
+ */
+int devSupCalcTooSmall(motorRecord *pmr, double diffDial, int isRetry)
+{
+    double spdb = pmr->spdb;
+    double absDiffDial = fabs(diffDial);
+    /*
+     * SPDB overrides MRES.
+     * Example: MRES == 1.0 and SPDP == 0.1 checks for 0.1
+     */
+    /* Don't move if new setpoint is within SPDB of DRBV */
+    if (spdb > 0) {
+        return (absDiffDial < spdb);
+    } else if (absDiffDial < fabs(pmr->mres)) {
+        return 1;
+    }
+    if (isRetry && (absDiffDial < fabs(pmr->rdbd))) {
+        return 1;
+    }
+    return 0;
+}

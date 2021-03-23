@@ -174,30 +174,45 @@ static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
        based on the record values. I think most of it should be transferred to init_record
        which is one reason why I have separated it into another routine */
     motorAsynPvt *pPvt = (motorAsynPvt *)pmr->dpvt;
-    double rawPos = pPvt->status.position;
-    double rdbd = (fabs(pmr->rdbd) < fabs(pmr->mres) ? fabs(pmr->mres) : fabs(pmr->rdbd) );
+    double dialPos = 0;
     double encRatio[2] = {pmr->mres, pmr->eres};
     int use_rel = (pmr->rtry != 0 && pmr->rmod != motorRMOD_I && (pmr->ueip || pmr->urip));
-    int dval_non_zero_pos_near_zero = (fabs(pmr->dval) > rdbd) &&
-                                      (pmr->mres != 0) && (fabs(rawPos * pmr->mres) < rdbd);
     int initPos = 0;
+    int too_small = 0;
+    const static int isRetry = 0;
 
+    if (pmr->mflg & MF_DRIVER_USES_EGU)
+    {
+        dialPos = pPvt->status.position;
+    }
+    else if (pmr->mres)
+    {
+        dialPos = pPvt->status.position * pmr->mres;
+    }
+    else
+    {
+        /* Should not happen */
+        Debug(pmr,3, "init_controller %s ERROR: pmr->mres=%f\n",
+              pmr->name, pmr->mres);
+        return;
+    }
     /*Before setting position, set the correct encoder ratio.*/
     start_trans(pmr);
     build_trans(SET_ENC_RATIO, encRatio, pmr);
     end_trans(pmr);
 
+    too_small |= devSupCalcTooSmall(pmr, fabs(pmr->dval - dialPos), isRetry);
     switch (pmr->rstm) {
         case motorRSTM_NearZero:
             {
-                if (dval_non_zero_pos_near_zero)
+                if (!too_small)
                     initPos = 1;
 
             }
             break;
         case motorRSTM_Conditional:
             {
-                if (use_rel || dval_non_zero_pos_near_zero)
+                if (use_rel || !too_small)
                     initPos = 1;
             }
             break;
@@ -205,9 +220,9 @@ static void init_controller(struct motorRecord *pmr, asynUser *pasynUser )
             initPos = 1;
             break;
     }
-    Debug(pmr,3, "init_controller %s rstm=%d pmr->dval=%f rawPos=%f pmr->rdbd=%f rdbd=%f pmr->mres=%f dval_non_zero_pos_near_zero=%d initPos=%d\n",
+    Debug(pmr,3, "init_controller %s rstm=%d pmr->dval=%f dialPos=%f rdbd=%f spbd=%f mres=%f too_small=%d initPos=%d\n",
           pmr->name,
-          (int)pmr->rstm, pmr->dval, rawPos, pmr->rdbd, rdbd, pmr->mres, dval_non_zero_pos_near_zero, initPos);
+          (int)pmr->rstm, pmr->dval, dialPos, pmr->rdbd, pmr->spdb, pmr->mres, too_small, initPos);
 
     if (initPos)
     {

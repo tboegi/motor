@@ -60,6 +60,7 @@ fields.  ('pmr' is a pointer to motorRecord.)
   void setCDIRfromRawMove(motorRecord *pmr, int directionRaw);
   void setCDIRfromDialMove(motorRecord *pmr, int directionDial);
   void doHomeSetcdir(motorRecord *pmr);
+  int  devSupCalcTooSmall(motorRecord *pmr, double diffDial, int isRetry);
 
   static inline const char *mrStripPath(const char *file)
   {
