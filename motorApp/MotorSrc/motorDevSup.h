@@ -95,10 +95,10 @@ fields.  ('pmr' is a pointer to motorRecord.)
          epicsTimeToStrftime(nowText,sizeof(nowText),     \
                           "%Y/%m/%d %H:%M:%S.%03f ",&now);\
        }                                                  \
-       mrPrint(pmr, lvl, "%s[%s:%-4d %s] " fmt,           \
+       mrPrint(pmr, lvl, "%s[%s:%-4d %s %02d] " fmt,      \
                nowText,                                   \
                mrStripPath(__FILE__), __LINE__,           \
-               pmr->name,  __VA_ARGS__);                  \
+               pmr->name, pmr->card,  __VA_ARGS__);       \
     }                                                     \
 }
 
