@@ -3049,6 +3049,11 @@ static long special(DBADDR *paddr, int after)
                     pmr->dmov = FALSE;
                     db_post_events(pmr, &pmr->dmov, DBE_VAL_LOG);
                 }
+                else
+                {
+                    /* to pick up last.dval == "first DVAL" */
+                    pmr->priv->last.dval = pmr->drbv;
+                }
                 return(OK);
 
             case motorRecordHOMF:
