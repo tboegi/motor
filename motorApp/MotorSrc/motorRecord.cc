@@ -2051,7 +2051,7 @@ static void doRetryOrDone(motorRecord *pmr, bool preferred_dir,
     }
     /* IF move is in preferred direction, AND, current position is within backlash range. */
     else if ((preferred_dir == true) &&
-             ((use_rel == true  && relbpos <= pmr->spdb) ||
+             ((use_rel == true  && fabs(relbpos) <= pmr->spdb) ||
               (use_rel == false && (fabs(pmr->dval - pmr->drbv) <= rbdst1))
              )
             )
