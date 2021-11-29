@@ -210,7 +210,8 @@ USAGE...        Motor Record Support.
 #include    "epicsExport.h"
 #include    "errlog.h"
 
-volatile int motorRecordDebug = 0;
+volatile int motorRecordDebug = 15;
+#define DEBUG
 extern "C" {epicsExportAddress(int, motorRecordDebug);}
 
 /*----------------debugging-----------------*/
@@ -220,8 +221,9 @@ static inline void Debug(int level, const char *format, ...) {
     if (level < motorRecordDebug) {
       va_list pVar;
       va_start(pVar, format);
-      vprintf(format, pVar);
+      vfprintf(stdout, format, pVar);
       va_end(pVar);
+      fflush(stdout);
     }
   #endif
 }
@@ -2200,6 +2202,10 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
             bool use_rel, preferred_dir, too_small;
             double relpos = pmr->diff / pmr->mres;
             double relbpos = ((pmr->dval - pmr->bdst) - pmr->drbv) / pmr->mres;
+            Debug(3, "XXXX0 %s:%d do_work dval=%f bdst=%f drbv=%f mres=%f relbpos=%f\n",
+                  __FILE__, __LINE__,
+                  pmr->dval,  pmr->bdst,  pmr->drbv, pmr->mres, relbpos);
+
             double rbdst1 = 1.0 + (fabs(pmr->bdst) / fabs(pmr->mres));
             long rdbdpos = NINT(pmr->rdbd / fabs(pmr->mres)); /* retry deadband steps */
             long rpos, npos, rtnstat;
@@ -2397,6 +2403,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
                  * since move is in preferred direction (preferred_dir==ON),
                  * AND, backlash acceleration and velocity are the same as slew values
                  * (BVEL == VELO, AND, BACC == ACCL). */
+                Debug(3, "XXXX1 %s:%d do_work bdst=%f preferred_dir=%d use_rel=%d relbpos=%f newpos=%f currpos=%f rbdst1=%f\n",
+                      __FILE__, __LINE__,
+                      pmr->bdst, (int)preferred_dir, (int)use_rel, relbpos, newpos, currpos, rbdst1);
                 if ((fabs(pmr->bdst) <  fabs(pmr->mres)) ||
                     (preferred_dir == true && pmr->bvel == pmr->velo &&
                      pmr->bacc == pmr->accl))
@@ -2426,6 +2435,9 @@ static RTN_STATUS do_work(motorRecord * pmr, CALLBACK_VALUE proc_ind)
  * encoder), or is a little nonlinear. (Blatantly nonlinear readback is not
  * handled by the motor record.)
  *****************************************************************************/
+                    Debug(3, "XXXX2 %s:%d do_work bdst=%f preferred_dir=%d use_rel=%d relbpos=%f newpos=%f currpos=%f rbdst1=%f\n",
+                          __FILE__, __LINE__,
+                          pmr->bdst, (int)preferred_dir, (int)use_rel, relbpos, newpos, currpos, rbdst1);
                     velocity = bvel;
                     accel = bacc;
                     if (use_rel == true)
