@@ -2008,8 +2008,8 @@ static void doRetryOrDone(motorRecord *pmr, bool preferred_dir,
     bool use_rel;
     bool moving_started = false;
 
-    Debug(pmr,2, "doRetryOrDone dval=%f rdbd=%f spdb=%f udf=%d stat=%d rcnt=%d pref_dir=%d relpos=%f relbpos=%f drbv=%f\n",
-          pmr->dval, pmr->rdbd, pmr->spdb, pmr->udf, pmr->stat, pmr->rcnt, preferred_dir,
+    Debug(pmr,2, "doRetryOrDone dval=%f rdbd=%f spdb=%f bdst=%f stat=%d rcnt=%d pref_dir=%d relpos=%f relbpos=%f drbv=%f\n",
+          pmr->dval, pmr->rdbd, pmr->spdb, pmr->bdst, pmr->stat, pmr->rcnt, preferred_dir,
           relpos, relbpos, pmr->drbv);
 
     /*** Use if encoder or ReadbackLink is in use. ***/
