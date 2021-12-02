@@ -430,11 +430,28 @@ calls.
 
         No checks are made in this code to ensure that these conditions are met.
 *******************************************************************************/
+
+static RTN_STATUS inline WriteMsgDebugPrintFL(const char *filename, int lineno,
+                                              motorRecord *pmr,
+                                              motor_cmnd cmd, double *parms)
+{
+    struct motor_dset *pdset;
+    pdset = (struct motor_dset *) pmr->dset;
+    Debug(5, "%s:%d WRITE_MSG cmd=%d parms=%f\n",
+          filename, lineno,
+          (int)cmd, parms ? *parms : 0.0);
+    return (*pdset->build_trans)((cmd), (parms), pmr);
+}
+
 /* To begin a transaction... */
 #define INIT_MSG()                              (*pdset->start_trans)(pmr)
 
+#if 0
 /* To send a single command... */
 #define WRITE_MSG(cmd,parms)    (*pdset->build_trans)((cmd), (parms), pmr)
+#else
+#define WRITE_MSG(cmd,parms)  WriteMsgDebugPrintFL(__FILE__, __LINE__, pmr, cmd, parms)
+#endif
 
 /* To end a transaction and send accumulated commands to the motor... */
 #define SEND_MSG()                              (*pdset->end_trans)(pmr)
