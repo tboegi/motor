@@ -431,15 +431,48 @@ calls.
         No checks are made in this code to ensure that these conditions are met.
 *******************************************************************************/
 
+
+static const char *motor_cmnd_to_ASCII(motor_cmnd cmd)
+{
+    switch (cmd)
+    {
+        case MOVE_ABS: return "MOVE_ABS";
+        case MOVE_REL: return "MOVE_REL";
+        case HOME_FOR: return "HOME_FOR";
+        case HOME_REV: return "HOME_REV";
+        case LOAD_POS: return "LOAD_POS";
+        case SET_VEL_BASE: return "SET_VEL_BASE";
+        case SET_VELOCITY: return "SET_VELOCITY";
+        case SET_ACCEL: return "SET_ACCEL";
+        case GO: return "GO";
+        case SET_ENC_RATIO: return "SET_ENC_RATIO";
+        case GET_INFO: return "GET_INFO";
+        case STOP_AXIS: return "STOP_AXIS";
+        case JOG: return "JOG";
+        case SET_PGAIN: return "SET_PGAIN";
+        case SET_IGAIN: return "SET_IGAIN";
+        case SET_DGAIN: return "SET_DGAIN";
+        case ENABLE_TORQUE: return "ENABLE_TORQUE";
+        case DISABL_TORQUE: return "DISABL_TORQUE";
+        case PRIMITIVE: return "PRIMITIVE";
+        case SET_HIGH_LIMIT: return "SET_HIGH_LIMIT";
+        case SET_LOW_LIMIT: return "SET_LOW_LIMIT";
+        case JOG_VELOCITY: return "JOG_VELOCITY";
+        case SET_RESOLUTION: return "SET_RESOLUTION";
+        default: return "CMDXX";
+    }
+}
+
 static RTN_STATUS inline WriteMsgDebugPrintFL(const char *filename, int lineno,
                                               motorRecord *pmr,
                                               motor_cmnd cmd, double *parms)
 {
     struct motor_dset *pdset;
     pdset = (struct motor_dset *) pmr->dset;
-    Debug(5, "%s:%d WRITE_MSG cmd=%d parms=%f\n",
+    Debug(5, "%s:%d WRITE_MSG cmd=%s (%d) parms=%f\n",
           filename, lineno,
-          (int)cmd, parms ? *parms : 0.0);
+          motor_cmnd_to_ASCII(cmd), (int)cmd,
+          parms ? *parms : 0.0);
     return (*pdset->build_trans)((cmd), (parms), pmr);
 }
 
@@ -911,6 +944,9 @@ static long postProcess(motorRecord * pmr)
                 {
                     double currpos = pmr->dval / pmr->mres;
                     double newpos = bpos + pmr->frac * (currpos - bpos);
+                    Debug(3, "XXXX4 %s:%d postProcess currpos=%f bpos=%f\n",
+                          __FILE__, __LINE__,
+                          currpos, bpos);
                     pmr->rval = NINT(newpos);
                     WRITE_MSG(MOVE_ABS, &newpos);
                 }
