@@ -2877,6 +2877,8 @@ velcheckB:
             pmr->vmax = temp_dbl;
             db_post_events(pmr, &pmr->vmax, DBE_VAL_LOG);
         }
+        set_dial_highlimit(pmr, pdset);
+        set_dial_lowlimit(pmr, pdset);
         break;
 
         /* new srev: make mres agree */
