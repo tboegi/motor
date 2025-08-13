@@ -1,0 +1,69 @@
+# How is a change into the VAL field of the motorRecord
+# transferred into the driver ?
+# This is a log from the ESS version of motor,
+# which does have printouts inside the motorRecord.cc itself.
+# Combined with the motor ethercatmc.
+# This is the first generation of ethercatmc, later versions have
+# different printouts.
+
+# Motor is at 100, user wants to move to 101
+# caput IOC:m1 101
+# The user writes to the VAL field, EPICS calls the special function,
+# twice. Once before the value is updated, once after
+
+2024/01/18 08:13:28.292 [motorRecord.cc:3199 IOC:m1 01] special fieldIdx=VAL value=100 after=0
+2024/01/18 08:13:28.292 [motorRecord.cc:3199 IOC:m1 01] special fieldIdx=VAL value=101 after=1
+
+# After that, process() is called in motorRecord.cc
+2024/01/18 08:13:28.292 [motorRecord.cc:1572 IOC:m1 01] process:---------------------- begin reason=0 mip=0x0('')
+2024/01/18 08:13:28.292 [motorRecord.cc:2724 IOC:m1 01] do_work: begin udf=0 stat=0 nsta=0 spmg=GO commandedDval=100.000000 dval=100.000000 last.dval=100.000000 drbv=100.000000 mip=0x0('')
+2024/01/18 08:13:28.292 [motorRecord.cc:2238 IOC:m1 01] doDVALchangedOrNOTdoneMoving: begin commandedDval=100.000000 dval=101.000000 last.dval=100.000000 drbv=100.000000 mip=0x0('')
+2024/01/18 08:13:28.292 [motorRecord.cc:2095 IOC:m1 01] doRetryOrDone dval=101.000000 rdbd=0.100000 spdb=0.100000 bdst=0.000000 stat=0 rcnt=0 pref_dir=1 relpos=1.000000 relbpos=1.000000 drbv=100.000000
+
+# Now the motorRecord has figured out, that a move() is needed
+2024/01/18 08:13:28.292 [motorRecord.cc:2108 IOC:m1 01] mipSetBit MOVE(Mo) old='' new=MOVE(Mo)
+2024/01/18 08:13:28.292 [motorRecord.cc:1086 IOC:m1 01] doMoveDialPosition(2127) mode=Position position=101.000000 frac=1.000000 use_rel=0 val=101.000000 diff=1.000000
+2024/01/18 08:13:28.292 [motorRecord.cc:2026 IOC:m1 01] process:---------------------- end
+
+# processing inside the reord has ended.
+# The move() had been transfered into the driver,
+# and we are now executing from a different thread
+
+# The values are transferred into the TwinCAT system
+# over the wire (ethernet, TCP/IP)
+2024/01/18 08:13:28.293 [ethercatmcController.cpp:815] out=Main.M1.bExecute=0;Main.M1.nCommand=3;Main.M1.nCmdData=0;Main.M1.fPosition=101.000000;Main.M1.fAcceleration=20.000000;Main.M1.fDeceleration=20.000000;Main.M1.fVelocity=20.000000;Main.M1.bExecute=1 in=OK;OK;OK;OK;OK;OK;OK;OK status=asynSuccess (0)
+
+# The poller calls the motorRecord (there is nothing new)
+2024/01/18 08:13:28.293 [motorRecord.cc:1572 IOC:m1 01] process:---------------------- begin reason=1 mip=0x20(MOVE(Mo))
+2024/01/18 08:13:28.293 [motorRecord.cc:1614 IOC:m1 01] msta.Bits.RA_DONE=0
+2024/01/18 08:13:28.294 [motorRecord.cc:2026 IOC:m1 01] process:---------------------- end
+
+# The poller inside EPICS has something new: The motor is moving (at least busy in TwinCAT speach)
+2024/01/18 08:13:28.294 [ethercatmcAxis.cpp:1295] poll(1) mvnNRdy=1 Ver=1 bBusy=1 bExe=1 bEnabled=1 atTarget=0 wf=3 ENC=0 fPos=0 fActPosition=100 time=0.000590
+2024/01/18 08:13:28.294 [ethercatmcAxis.cpp:957] poll(1) callParamCallbacksUpdateError Error=0 old=0 ErrID=0x0 old=0x0 Warn=0 nCmd=3 old=0 txt=NULL
+
+# The callback goes into the motorRecord. The position has not changed
+# The bit "motor moving" is now 1
+2024/01/18 08:13:28.294 [motorRecord.cc:1572 IOC:m1 01] process:---------------------- begin reason=1 mip=0x20(MOVE(Mo))
+2024/01/18 08:13:28.294 [motorRecord.cc:1594 IOC:m1 01] msta.Bits.RA_MOVING=1
+2024/01/18 08:13:28.294 [motorRecord.cc:2026 IOC:m1 01] process:---------------------- end
+# Moving has finished
+2024/01/18 08:13:29.107 [ethercatmcAxis.cpp:1295] poll(1) mvnNRdy=0 Ver=1 bBusy=0 bExe=1 bEnabled=1 atTarget=0 wf=0 ENC=33 fPos=0 fActPosition=101 time=0.001890
+2024/01/18 08:13:29.107 [ethercatmcAxis.cpp:957] poll(1) callParamCallbacksUpdateError Error=0 old=0 ErrID=0x0 old=0x0 Warn=0 nCmd=0 old=3 txt=NULL
+
+# motorRecord gets a callback
+2024/01/18 08:13:29.107 [motorRecord.cc:1572 IOC:m1 01] process:---------------------- begin reason=1 mip=0x20(MOVE(Mo))
+2024/01/18 08:13:29.107 [motorRecord.cc:1594 IOC:m1 01] msta.Bits.RA_MOVING=0
+2024/01/18 08:13:29.107 [motorRecord.cc:1614 IOC:m1 01] msta.Bits.RA_DONE=1
+2024/01/18 08:13:29.107 [motorRecord.cc:1779 IOC:m1 01] motor is stopped dval=101.000000 drbv=101.000000 pp=0 udf=0 stat=0 stop=0 pmr->spmg=GO mip=0x20(MOVE(Mo)) msta=0x4923
+2024/01/18 08:13:29.107 [motorRecord.cc:1782 IOC:m1 01] setDmov old=0 new=1
+2024/01/18 08:13:29.107 [motorRecord.cc:1913 IOC:m1 01] (stopped) dmov==TRUE; no DLY; pp=0 udf=0 stat=0 sevr=0 mip=0x20(MOVE(Mo))
+2024/01/18 08:13:29.107 [motorRecord.cc:1328 IOC:m1 01] maybeRetry: close enough commandedDval=101.000000 last.dval=100.000000 dval=101.000000 drbv=101.000000 rdbd=0.100000 diff=0.000000 rcnt=0 pmr->rtry=1 mip=0x20(MOVE(Mo))
+2024/01/18 08:13:29.107 [motorRecord.cc:1376 IOC:m1 01] mipClrBit 'Jf Jr J1 Hf Hr Mo Ry Lp Mb St Dr Da jS J2 Ex' old=MOVE(Mo) new=''
+2024/01/18 08:13:29.107 [motorRecord.cc:2724 IOC:m1 01] do_work: begin udf=0 stat=0 nsta=0 spmg=GO commandedDval=101.000000 dval=101.000000 last.dval=100.000000 drbv=101.000000 mip=0x0('')
+2024/01/18 08:13:29.107 [motorRecord.cc:2238 IOC:m1 01] doDVALchangedOrNOTdoneMoving: begin commandedDval=101.000000 dval=101.000000 last.dval=100.000000 drbv=101.000000 mip=0x0('')
+2024/01/18 08:13:29.107 [motorRecord.cc:2290 IOC:m1 01] too_small dval=101.000000 spdb=0.100000 mres=1.000000 drbv=101.000000
+
+# Under the time while moving, nobody has written a new value to the .VAL field.
+# We are done
+2024/01/18 08:13:29.108 [motorRecord.cc:2026 IOC:m1 01] process:---------------------- end
