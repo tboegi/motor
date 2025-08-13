@@ -1,0 +1,118 @@
+To be able to maintain new features without breaking existing
+applications, there are new asynParameters defined, which the
+model 3 driver can activate.
+They are then "mirrored" into the .MFLG field of the motorRecord,
+bit by bit.
+In other words, they can be activated by setting the bit in the
+.MFLG field in the template/Db file or by doing like this (per axis)
+
+#ifdef motorFlagsDriverUsesEGUString
+  setIntegerParam(pC_->motorFlagsDriverUsesEGU_,1);
+#endif
+
+flags had been added over the time, and some had been removed.
+So in general it is a good idea to use the #ifdef as shown above.
+
+Here comes a summary of the stings:
+#define motorFlagsHomeOnLsString        "MOTOR_FLAGS_HOME_ON_LS"
+#define motorFlagsLSrampDownString      "MOTOR_FLAGS_LS_RAMP_DOWN"
+#define motorFlagsNoStopOnLsString      "MOTOR_FLAGS_NO_STOP_ON_LS"
+#define motorFlagsDriverUsesEGUString   "MOTOR_FLAGS_DRIVER_USES_EGU"
+#define motorFlagsAdjAfterHomedString   "MOTOR_FLAGS_ADJ_AFTER_HOMED"
+#define motorFlagsNtmUpdateString       "MOTOR_FLAGS_NTM_UPDATE"
+#define motorFlagsNotHomedProblemString "MOTOR_FLAGS_NOT_HOMED_PROBLEM"
+#define motorFlagsNoTweakOnLsString     "MOTOR_FLAGS_NO_TWEAK_ON_LS"
+#define motorFlagsRwSoftLimitsString    "MOTOR_FLAGS_RW_SOFT_LIMITS"
+
+And the asyn parameter:
+  int motorFlagsHomeOnLs_;
+  int motorFlagsLSrampDown_;
+  int motorFlagsNoStopOnLS_;
+  int motorFlagsDriverUsesEGU_;
+  int motorFlagsAdjAfterHomed_;
+  int motorFlagsNtmUpdate_;
+  int motorFlagsNotHomedProblem_;
+  int motorFlagsNoTweakOnLs_;
+  int motorFlagsRwSoftLimits_;
+
+Here comes a summary:
+HomeOnLs:
+  HOMF is allowed when HLS is set
+  HOMR is allowed when LLS is set
+  Touching a/the limit switch while homing is not treated as "done",
+  the controller must signal "done" by calling
+      setIntegerParam(pC_->motorStatusDone_, 1);
+
+LSrampDown:
+  Touching a/the limit switch while homing is not treated as "done",
+  the controller must signal "done" by calling
+      setIntegerParam(pC_->motorStatusDone_, 1);
+
+NoStopOnLS:
+   Due to a mis-understanding code had been added to the motorRecord
+   that sends a STOP to the controller, when the limit switch is hit.
+   Setting this flag switches this (wrong) code off.
+   Probably it can be retired.
+
+DriverUsesEGU:
+   We do not use MRES for any calculation between record and driver.
+   The driver gets the value from the DVAL field "as is".
+   The same is for the readback of motor position.
+   Note: This flag is used in both ethercatmc and ecmc
+
+AdjAfterHomed:
+   After homing we move the motor into the soft limit range, if needed.
+   Example: The motor stops at 0.0 after homing and LLM is 5.0
+   The motor is moved to 5.0
+
+NtmUpdate:
+   The motor/driver supports NTM=NTM_UPDATE.
+
+NotHomedProblem:
+  When the motor is not homed,
+  the motorRecord is put into "major state alarm'
+
+NoTweakOnLs:
+  This fixes an old bug/limitation:
+  When the motor is sitting on the high limit switch, a write to the
+  TWF field will cause a move command towards the driver/controller.
+  The same for the low limit switch and the TWR field.
+  And the driver or motion controller should "filter out"/reject the
+  movement.
+  Setting this flag will filter out these movements already in the
+  motorRecord.
+
+RwSoftLimits:
+  Setting this flag will turn the "read only" soflimits from the
+  controller into "read write" soft limits.
+  See Softlimits.txt
+
+Other features, which are handled inside the model 3 driver
+They are not part of the motorRecord:
+
+#ifdef motorWaitPollsBeforeReadyString
+  setIntegerParam(pC_->motorWaitPollsBeforeReady_ , WAITNUMPOLLSBEFOREREADY);
+#endif
+Workaround for the "ready before even started" race condition
+
+
+#ifdef motorShowPowerOffString
+    setIntegerParam(pC_->motorShowPowerOff_, 1);
+#endif
+The message-text variable (motorMessageText_) will be updated
+by the model 3 driver to show "PowerOff" whenever the amplifier if off.
+
+
+#ifdef  motorNotHomedProblemString
+    setIntegerParam(pC_->motorNotHomedProblem_, MOTORNOTHOMEDPROBLEM_ERROR);
+#endif
+The message-text variable (motorMessageText_) will be updated
+
+
+Obsolete:
+#ifdef motorFlagsPwrWaitForOnString
+  setIntegerParam(pC_->motorFlagsPwrWaitForOn_, 1);
+#endif
+#ifdef motorFlagsNoStopProblemString
+  setIntegerParam(pC_->motorFlagsNoStopProblem_, 1);
+#endif
