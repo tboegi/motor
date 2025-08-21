@@ -8,6 +8,11 @@ https://github.com/epics-modules/motor/
 
 # Changes to upstream motor, the most important ones
 
+## v7.2.8-ESS, based on R7-3-1, and latest master.
+###  Improvements
+#### db0df00d0b: Implement read write soft limits. See docs/Softlimits.txt
+### Documentation update:
+#### ecc76037eb: motorRecord.html: Document MRES changes soft limits
 ## v7.2.7-ESS, based on R7-3-1, and latest master.
 ###  Bug fixes
 #### 7f5aa6177: motorRecord: another update after LS error: Endless loop
