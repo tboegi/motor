@@ -8,6 +8,9 @@ https://github.com/epics-modules/motor/
 
 # Changes to upstream motor, the most important ones
 
+## v7.2.81-ESS, based on R7-3-1, and latest master.
+###  Bug fix
+#### 99d16dcdbb: asynMotorController: Fix for wrong timeout in pollAll()
 ## v7.2.8-ESS, based on R7-3-1, and latest master.
 ###  Improvements
 #### db0df00d0b: Implement read write soft limits. See docs/Softlimits.txt
