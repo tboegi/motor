@@ -1,5 +1,77 @@
 # Motor Releases
 
+## __R7-4 (2026-03-09)__
+R7-4 is a release based on the master branch.
+
+### Changes since R7-3-1
+
+#### New features
+* Pull request [#238](https://github.com/epics-modules/motor/pull/238): [Torsten Bögershausen](https://github.com/tboegi) added motorActVelocity asyn parameter to model-3 asyn motor base classes for velocity feedback
+* Pull request [#242](https://github.com/epics-modules/motor/pull/242): Added STD to the modules/Makefile (for driver submodules with example IOCs that use doAfterIocInit)
+
+#### Modifications to existing features
+* None
+
+#### Bug fixes
+* Commit [d1ed86f](https://github.com/epics-modules/motor/commit/d1ed86f128733070ec720286d1e1fad05e8e8156): Fixed typo in trajectoryScan_settings.req that prevented Nelements from being saved
+* Pull request [#214](https://github.com/epics-modules/motor/pull/214): devMotorAsyn.c: Set encoder ratio to 1 if ERES is 0 to avoid dividing by 0
+* Pull request [#220](https://github.com/epics-modules/motor/pull/220): Fix for motorRecord.cc from [Torsten Bögershausen](https://github.com/tboegi): Post ueip if reset to false when encoder missing
+* Pull request [#224](https://github.com/epics-modules/motor/pull/224): Fix for motorRecord.cc from [Torsten Bögershausen](https://github.com/tboegi): Fix for endless loop caused by a specific sequence of changes to the VAL and HOMF fields
+* Pull request [#236](https://github.com/epics-modules/motor/pull/236): [Stefan Mathis](https://github.com/StefanMathis) fixed a bug in asynMotorAxis that prevented the motor record's RVEL field from updating with the feedback velocity
+* Pull request [#240](https://github.com/epics-modules/motor/pull/240): Fix for infinite loop in motordrvCom.cc that prevented graceful shutdown of IOCs with model-1 motor drivers.
+* Pull request [#243](https://github.com/epics-modules/motor/pull/243): Updated driver submodules for VxWorks fixes
+* Pull request [#208](https://github.com/epics-modules/motor/pull/208): [Jeremy Lorelli](https://github.com/JJL772) removed the deprecated "register" keyword from motordrvCom.cc
+
+#### Documentation
+* Pull request [#221](https://github.com/epics-modules/motor/pull/221): [Torsten Bögershausen](https://github.com/tboegi) improved the documentation for the CNEN, HOMF and HOMR fields
+* Pull request [#223](https://github.com/epics-modules/motor/pull/223): [J. Lewis Muir](https://github.com/jlmuir) fixed typos in motorDeviceDriver.html
+* Pull request [#225](https://github.com/epics-modules/motor/pull/225): [J. Lewis Muir](https://github.com/jlmuir) fixed typos in motorRecord.html
+* Pull request [#235](https://github.com/epics-modules/motor/pull/235) as well as commits [26efd2f](https://github.com/epics-modules/motor/commit/26efd2f044f6281b5c5889d604cd43f84b4bf615) and [3228061](https://github.com/epics-modules/motor/commit/3228061a602a799794f80bdfd88e7e96b52224fe): Added EPICS license
+* Pull request [#227](https://github.com/epics-modules/motor/pull/227): [Torsten Bögershausen](https://github.com/tboegi) updated motorRecord.html: document MRES changes soft limits
+* Pull request [#237](https://github.com/epics-modules/motor/pull/237): Updated OMS PID info in motorRecord.html
+
+#### Continuous Integration
+* Upgraded ci-scripts to v3.4.1
+
+#### Driver submodules (and noteworthy changes)
+
+**Note:** A newer release of motorAttocube exists ([R1-1](https://github.com/epics-motor/motorAttocube/releases/tag/R1-1)), but it isn't included in this release because it requires EPICS base 7.0.3.1 or later.  It will be included in a future release when support for EPICS base 3.15 is dropped.
+
+| Module             | Release | Changes |
+| ------------------ | ------- | ------- |
+| motorAcs           | [R1-1-1](https://github.com/epics-motor/motorAcs/releases/tag/R1-1-1) |         |
+| **motorAcsMotion** | [R2-3-2](https://github.com/epics-motor/motorAcsMotion/releases/tag/R2-3-2) | Many bugfixes and new features since R2-2; see [RELEASE NOTES](https://github.com/epics-motor/motorAcsMotion/blob/0217e915adfafeb7983d3ef4529f7a77fd8fedb0/docs/RELEASE.md) |
+| motorAcsTech80     | [R1-0-2](https://github.com/epics-motor/motorAcsTech80/releases/tag/R1-0-2) |         |
+| motorAerotech      | [R1-1-1](https://github.com/epics-motor/motorAerotech/releases/tag/R1-1-1) |         |
+| motorAMCI          | [R1-0-2](https://github.com/epics-motor/motorAMCI/releases/tag/R1-0-2) |         |
+| motorAttocube      | [R1-0-2](https://github.com/epics-motor/motorAttocube/releases/tag/R1-0-2) | **See note above** |
+| motorDeltaTau      | [R1-0-2](https://github.com/epics-motor/motorDeltaTau/releases/tag/R1-0-2) |         |
+| motorFaulhaber     | [R1-0-2](https://github.com/epics-motor/motorFaulhaber/releases/tag/R1-0-2) |         |
+| **motorHytec**     | [R1-0-4](https://github.com/epics-motor/motorHytec/releases/tag/R1-0-4) | Bugfix: only send positive velocities to the controller |
+| **motorIms**       | [R1-0-2](https://github.com/epics-motor/motorIms/releases/tag/R1-1) | Added support for querying and clear locked rotor faults and party-line communication improvements |
+| motorKohzu         | [R1-0-2](https://github.com/epics-motor/motorKohzu/releases/tag/R1-0-2) |         |
+| motorMclennan      | [R1-1-1](https://github.com/epics-motor/motorMclennan/releases/tag/R1-1-1) |         |
+| **motorMicos**     | [R2-1-1](https://github.com/epics-motor/motorMicos/releases/tag/R2-1-1) | Fix for build errors when using base 3.15; eliminated compiler warnings |
+| motorMicroMo       | [R1-0-2](https://github.com/epics-motor/motorMicroMo/releases/tag/R1-0-2) |         |
+| **motorMicronix**  | [R1-2](https://github.com/epics-motor/motorMicronix/releases/tag/R1-2) | MMC-110 and MMC-ETHERNET module now supported; resolution bugfixes |
+| **motorMotorSim**  | [R1-3](https://github.com/epics-motor/motorMotorSim/releases/tag/R1-3) | Bug fix for first axis stuck in moving state |
+| motorMXmotor       | [R1-0-2](https://github.com/epics-motor/motorMXmotor/releases/tag/R1-0-2) |         |
+| **motorNewFocus**  | [R1-3](https://github.com/epics-motor/motorNewFocus/releases/tag/R1-3) | Added support for daisy-chained controllers to 874xMotorDriver |
+| **motorNewport**   | [R1-3](https://github.com/epics-motor/motorNewport/releases/tag/R1-3) | Added support for CONEX-AGAP and HXP-D controllers; bug fixes |
+| motorNPoint        | [R1-1](https://github.com/epics-motor/motorNPoint/releases/tag/R1-1) |         |
+| **motorOms**       | [R1-2-1](https://github.com/epics-motor/motorOms/releases/tag/R1-2-1)  | Allow encoder ratio to be negative when motor and encoder have opposite senses of direction |
+| **motorOmsAsyn**   | [R1-1](https://github.com/epics-motor/motorOmsAsyn/releases/tag/R1-1) | Added support for the MXA-21 controller |
+| motorOriel         | [R1-0-2](https://github.com/epics-motor/motorOriel/releases/tag/R1-0-2) |         |
+| **motorParker**    | [R1-2-1](https://github.com/epics-motor/motorParker/releases/tag/R1-2-1) | Added support for OEM series controllers |
+| **motorPhytron**   | [R1-3-1](https://github.com/epics-motor/motorPhytron/releases/tag/R1-3-1) | Added support for MCC-1/MCC-2 controllers and I/O support for all Phytron controllers |
+| **motorPI**        | [R1-1-2](https://github.com/epics-motor/motorPI/releases/tag/R1-1-2) | Fix for clang 16 build errors caused by use of deprecated keyword |
+| **motorPIGCS2**    | [R1-3-1](https://github.com/epics-motor/motorPIGCS2/releases/tag/R1-3-1) | Added coordinate-system support for C-887 hexapod controller; print fewer debug messages by default |
+| motorPiJena        | [R1-0-2](https://github.com/epics-motor/motorPiJena/releases/tag/R1-0-2) |         |
+| motorScriptMotor   | [R1-2](https://github.com/epics-motor/motorScriptMotor/releases/tag/R1-2) |         |
+| **motorSmarAct**   | [R2-1-2](https://github.com/epics-motor/motorSmarAct/releases/tag/R2-1-2) | Added support for sensorless positioners; eliminated compiler warnings |
+| motorSmartMotor    | [R1-0-2](https://github.com/epics-motor/motorSmartMotor/releases/tag/R1-0-2) |         |
+| **motorThorLabs** | [R1-0-3](https://github.com/epics-motor/motorThorLabs/releases/tag/R1-0-3) | Kinesis support now sends velo and accel to controller; fix for windows-x64-mingw compile errors |
+
 ## __R7-3-1 (2023-06-07)__
 R7-3-1 is a release based on the master branch.
 

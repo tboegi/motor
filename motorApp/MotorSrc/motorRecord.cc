@@ -193,8 +193,8 @@ USAGE...        Motor Record Support.
  * .79 21-11-22 jrh - Added raw limits, sync limits on motor resolution change
  */                                                          
 
-/* ess version. both R7-2-2 and R7-3 are upstream */
-#define VERSION 7.281
+/* ess version. R7-3-1 is upstream */
+#define VERSION 7.32
 
 #include    <stdlib.h>
 #include    <string.h>

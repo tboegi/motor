@@ -400,3 +400,7 @@ Beside many bugfixes and improvements, here some high lights:
     Removed all compiler warnings in the motor module.
     (Those that my compilers showed)
 
+## License
+
+motor is distributed subject to a Software License Agreement found in the file [EPICS.txt](./LICENSES/EPICS.txt) that is included with this distribution.
+
